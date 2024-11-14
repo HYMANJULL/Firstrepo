@@ -5,16 +5,24 @@ const computerScoreElement = document.getElementById("computer-score");
 const resultText = document.getElementById("result-text");
 const choices = document.querySelectorAll(".choice");
 
+// Load sound files
+const clickSound = new Audio("sounds/click.mp3");
+const winSound = new Audio("sounds/win.mp3");
+const loseSound = new Audio("sounds/lose.mp3");
+
 let playerScore = 0;
 let computerScore = 0;
 
 choices.forEach(choice => {
   choice.addEventListener("click", () => {
+    clickSound.play(); // Play click sound on choice
     const playerChoice = choice.dataset.choice;
     const computerChoice = getComputerChoice();
     const result = determineWinner(playerChoice, computerChoice);
     displayResult(result, playerChoice, computerChoice);
     updateScore(result);
+    playResultSound(result); // Play sound based on result
+    animateResult(result);
   });
 });
 
@@ -39,14 +47,17 @@ function determineWinner(player, computer) {
 function displayResult(result, playerChoice, computerChoice) {
   if (result === "win") {
     resultText.textContent = `You won! ${capitalize(playerChoice)} beats ${capitalize(computerChoice)}!`;
-    resultText.style.color = "#4CAF50";
+    resultText.classList.add("win");
   } else if (result === "lose") {
     resultText.textContent = `You lost! ${capitalize(computerChoice)} beats ${capitalize(playerChoice)}!`;
-    resultText.style.color = "#FF5252";
+    resultText.classList.add("lose");
   } else {
     resultText.textContent = "It's a draw!";
-    resultText.style.color = "#FFB74D";
+    resultText.classList.add("draw");
   }
+  setTimeout(() => {
+    resultText.classList.remove("win", "lose", "draw");
+  }, 1000);
 }
 
 function updateScore(result) {
@@ -57,6 +68,19 @@ function updateScore(result) {
     computerScore++;
     computerScoreElement.textContent = computerScore;
   }
+}
+
+function playResultSound(result) {
+  if (result === "win") {
+    winSound.play();
+  } else if (result === "lose") {
+    loseSound.play();
+  }
+}
+
+function animateResult(result) {
+  resultText.classList.add("animated");
+  setTimeout(() => resultText.classList.remove("animated"), 500);
 }
 
 function capitalize(word) {
